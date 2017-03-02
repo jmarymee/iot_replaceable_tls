@@ -22,7 +22,7 @@ You will need to OBTAIN these things:
 
 You will need to DO these things:
 - Modify your local hosts file (C:\Windows\system32\drivers\etc\hosts) to point 127.0.0.1 to protocol-gateway.contoso.com
-- Create an Azure IOT Bub with at least ONE device
+- Create an Azure IOT Hub with at least ONE device
 - Obtain Azure IOT Hub Connection String and replace the one in the Azure Protocol Gateway 
 - Obtain device info (name, a SAS key - generated from the Device Explorer, Azure IOT Hub URL)
 - Update the uMQTT main.c code to add the device client info and other IOT Hub creds
@@ -116,6 +116,10 @@ This is where we set the device name and access strings for the uMQTT client to 
 - Open the source file `mqtt_client_sample.c`
 - Scroll / locate the function body for `void mqtt_client_sample_run()`
 
+Starting at line 19, you will need to modify the TOPIC_SUB_NAME_A and TOPIC_NAMEA and TOPIC_NAMEB entries
+- The example shows: 'devices/APQDevice/messages/events'. The second item betwee the forward slashes MUST match your device name
+- Change the device-name portion of the TOPIC_SUB_NAME_A and TOPIC_NAME_A and TOPIC_NAME_B entries to match your device name. The device name is what you named your device in step 4
+
 Starting at line 206, you will need to make some changes to make your Azure IOT connection work.
 - Change the device name in line 206 `options.clientId =` to use your device name. The one present is `APQDevice`. The device name is what you named your device in Step Four. 
 - Change the `options.username =` to point to your IOT hub and device. This a combination of the URL that points to your Azure IOT Hub, then the device name, then the API Version
@@ -160,3 +164,6 @@ To send a message from Cloud to device:
 - Click the `Send` button. You should see the message appear in both the Protocol Gateway console output AND the client Console output
 
 Congratulations! You have now connected an MQTT client to Azure IOT via a Protocol Gateway with a custom TLS provider.
+
+# Common Issues
+1) Client SAS Expiration. The MQTT client performs a pass-through authentication to the IOT Hub via the Gateway using a name and password. The password is a SAS token generated using Device Explorer or perhaps programmatically. They are usually life-limited. If they expire then you will see the client connect to the Gateway (in the console screen) but then fail. That's due to the IOT Hub rejecting the SAS. The solution is to generate a new SAS and paste it into the MQTT client sample. Compile and run and all should be fine 
